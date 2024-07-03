@@ -1,1 +1,1 @@
-# serverless-1
+# Serverless practice on AWS
