@@ -10,7 +10,9 @@
             "ssm:PutParameter",
             "ssm:GetParameter",
             "kms:Decrypt",
-            "sqs:ReceiveMessage"
+            "sqs:ReceiveMessage",
+            "sqs:DeleteMessage",
+            "sqs:GetQueueAttributes"
           ],
           "Effect": "Allow",
           "Resource": "*"
