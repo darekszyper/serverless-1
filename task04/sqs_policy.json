@@ -1,0 +1,14 @@
+{
+  "Statement": [
+    {
+      "Action": [
+        "lambda:CreateEventSourceMapping",
+        "lambda:ListEventSourceMappings",
+        "lambda:ListFunctions"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ],
+  "Version": "2012-10-17"
+}

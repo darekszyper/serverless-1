@@ -67,7 +67,7 @@
     "maximum_message_size": 1024,
     "message_retention_period": 60,
     "receive_message_wait_time_seconds": 20,
-    "policy": {},
+    "policy": "sqs-policy",
     "redrive_policy": {},
     "content_based_deduplication": false
   },
@@ -75,5 +75,22 @@
     "resource_type": "sns_topic",
     "region": "eu-central-1",
     "event_sources": []
+  },
+  "sqs-policy": {
+    "resource_type": "iam_policy",
+    "policy_content": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Action": [
+            "lambda:CreateEventSourceMapping",
+            "lambda:ListEventSourceMappings",
+            "lambda:ListFunctions"
+          ],
+          "Effect": "Allow",
+          "Resource": "*"
+        }
+      ]
+    }
   }
 }
