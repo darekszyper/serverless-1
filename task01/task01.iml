@@ -10,14 +10,12 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-lambda-java-core:1.2.0" level="project" />
-    <orderEntry type="library" name="Maven: com.amazonaws:aws-lambda-java-events:3.11.4" level="project" />
-    <orderEntry type="library" name="Maven: joda-time:joda-time:2.10.8" level="project" />
     <orderEntry type="library" name="Maven: net.sf.aws-syndicate:deployment-configuration-annotations:1.11.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.16.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.16.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.16.1" level="project" />
   </component>
   <component name="SonarLintModuleSettings">
-    <option name="uniqueId" value="e8608a1c-1c2e-4a16-961c-34d6c9fab9be" />
+    <option name="uniqueId" value="2f3809ed-5802-432e-be97-ea107ea2d5f3" />
   </component>
 </module>

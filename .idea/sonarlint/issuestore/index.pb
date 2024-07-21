@@ -47,3 +47,18 @@ P
 task02/README.md,7\d\7d167e109d0d8a8ece8f7208305985cbc9d7e885
 `
 0task02/jsrc/main/java/com/task02/HelloWorld.java,7\f\7f946ed7a55bacfad358955a4e76ab63e3c13121
+:
+
+.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+`
+0task03/jsrc/main/java/com/task03/HelloWorld.java,0\2\0257c8c2ed29b10bac8f1976c080eaeef078115f
+A
+task03/.gitignore,5\a\5afa96570d40a632b90317992bfa066e659f24fb
+P
+ task03/deployment_resources.json,6\7\674e58043e9168ec56d28a92666b52a9265f41c6
+`
+0task04/jsrc/main/java/com/task04/SnsHandler.java,2\8\2896049f413a0f81a76d572d196712847e576998
+P
+ task04/deployment_resources.json,a\8\a84ae250f3418e250fcb34236d2d05dcedc2231d
+`
+0task04/jsrc/main/java/com/task04/SqsHandler.java,e\f\efbb743438b372288ade471b491d81c2e5b26013
