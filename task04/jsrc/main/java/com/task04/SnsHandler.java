@@ -34,7 +34,8 @@ public class SnsHandler implements RequestHandler<SNSEvent, Void> {
 
     private void sendMessageToCloudWatchLogs(SNSRecord msg, Context context) {
         try {
-            context.getLogger().log(msg.toString());
+            String message = msg.getSNS().getMessage();
+            context.getLogger().log(message);
         } catch (Exception e) {
             context.getLogger().log("An error occurred");
             throw e;
