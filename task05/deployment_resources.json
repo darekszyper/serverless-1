@@ -49,6 +49,7 @@
       "/events": {
         "enable_cors": false,
         "POST": {
+          "enable_proxy": true,
           "authorization_type": "NONE",
           "integration_type": "lambda",
           "lambda_name": "api_handler",
