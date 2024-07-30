@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syndicate.deployment.annotations.lambda.LambdaHandler;
 import com.syndicate.deployment.model.RetentionSetting;
 
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -47,7 +48,10 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 
             // Create the event item
             String id = UUID.randomUUID().toString();
-            String createdAt = ZonedDateTime.now().format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
+            OffsetDateTime now = OffsetDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX");
+            String createdAt = now.format(formatter);
+
 
             Item item = new Item()
                     .withPrimaryKey("id", id)
