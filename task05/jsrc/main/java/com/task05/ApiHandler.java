@@ -47,7 +47,7 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 
             // Create the event item
             String id = UUID.randomUUID().toString();
-            String createdAt = ZonedDateTime.now().format(DateTimeFormatter.ISO_INSTANT);
+            String createdAt = ZonedDateTime.now().format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
 
             Item item = new Item()
                     .withPrimaryKey("id", id)

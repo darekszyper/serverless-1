@@ -78,3 +78,17 @@ C
 task04/README.md,4\c\4cff8e4cf6cef0aa7ef62f361b9ca8fb544fd085
 F
 task04/sqs_policy.json,e\a\ea15568cba6509300b836149a492b66cea60aa5e
+A
+task05/.gitignore,f\9\f90cf160a0aaf9d98972753e29a51b3f1339852e
+C
+task05/CHANGELOG.md,0\8\0858b937693b22934a60f0194fe5b39449b9351a
+@
+task05/README.md,3\9\394526d21bd45e304e18e2ee2d2248fe012c5ffc
+P
+ task05/deployment_resources.json,4\1\417a00d3450baefd309341593f7e4cffb4547123
+>
+task05/pom.xml,7\5\75898c9158d3f6be30dc2aa9a1a19444b177a742
+A
+task05/task05.iml,f\3\f3b783654bbd0c202980716279a4aa84b839ca7e
+`
+0task05/jsrc/main/java/com/task05/ApiHandler.java,8\6\86cbefa18809f67e2629e91b35f516301fe79a90
