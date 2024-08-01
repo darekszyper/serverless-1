@@ -33,7 +33,7 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 
     public ApiHandler() {
         this.dynamoDB = new DynamoDB(AmazonDynamoDBClientBuilder.defaultClient());
-        this.table = dynamoDB.getTable("cmtr-7a75be14-Events");
+        this.table = dynamoDB.getTable("cmtr-7a75be14-Events-test");
         this.objectMapper = new ObjectMapper();
     }
 
