@@ -23,48 +23,47 @@ import java.util.UUID;
 @DynamoDbTriggerEventSource(targetTable = "Configuration", batchSize = 1)
 public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 
-	private final AmazonDynamoDB dynamoDB;
-
-	public AuditProducer() {
-		this.dynamoDB = AmazonDynamoDBClientBuilder.defaultClient();
-	}
+	private final AmazonDynamoDB dynamoDBClient = AmazonDynamoDBClientBuilder.defaultClient();
+	private static final String AUDIT_TABLE_NAME = "cmtr-7a75be14-Audit-test";
 
 	@Override
-	public Void handleRequest(DynamodbEvent event, Context context) {
-		event.getRecords().forEach(streamRecord -> {
-			switch (streamRecord.getEventName()) {
-				case "INSERT":
-					handleInsert(streamRecord.getDynamodb().getNewImage());
-					break;
-				case "MODIFY":
-					handleUpdate(streamRecord.getDynamodb().getOldImage(), streamRecord.getDynamodb().getNewImage());
-					break;
-				default:
-					break;
+	public Void handleRequest(DynamodbEvent dynamoDbEvent, Context context) {
+		for (DynamodbEvent.DynamodbStreamRecord record : dynamoDbEvent.getRecords()) {
+			if ("INSERT".equals(record.getEventName())) {
+				Map<String, AttributeValue> newImage = record.getDynamodb().getNewImage();
+				createAuditLogForInsert(newImage);
+			} else if ("MODIFY".equals(record.getEventName())) {
+				Map<String, AttributeValue> oldImage = record.getDynamodb().getOldImage();
+				Map<String, AttributeValue> newImage = record.getDynamodb().getNewImage();
+				createAuditLogForUpdate(oldImage, newImage);
 			}
-		});
+		}
 		return null;
 	}
 
-	private void handleInsert(Map<String, AttributeValue> newItem) {
-		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> item = createCommonAuditLogItem(newItem);
-		item.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(newItem.get("value").getN()));
-		dynamoDB.putItem(new PutItemRequest().withTableName("cmtr-7a75be14-Audit-test").withItem(item));
+	private void createAuditLogForInsert(Map<String, AttributeValue> newImage) {
+		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> auditItem = new HashMap<>();
+		auditItem.put("id", new com.amazonaws.services.dynamodbv2.model.AttributeValue(UUID.randomUUID().toString()));
+		auditItem.put("itemKey", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("key").getS()));
+		auditItem.put("modificationTime", new com.amazonaws.services.dynamodbv2.model.AttributeValue(Instant.now().toString()));
+		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("value").getN()));
+
+		putItemInAuditTable(auditItem);
 	}
 
-	private void handleUpdate(Map<String, AttributeValue> oldItem, Map<String, AttributeValue> newItem) {
-		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> item = createCommonAuditLogItem(newItem);
-		item.put("updatedAttribute", new com.amazonaws.services.dynamodbv2.model.AttributeValue("value"));
-		item.put("oldValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(oldItem.get("value").getN()));
-		item.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(newItem.get("value").getN()));
-		dynamoDB.putItem(new PutItemRequest().withTableName("cmtr-7a75be14-Audit-test").withItem(item));
+	private void createAuditLogForUpdate(Map<String, AttributeValue> oldImage, Map<String, AttributeValue> newImage) {
+		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> auditItem = new HashMap<>();
+		auditItem.put("id", new com.amazonaws.services.dynamodbv2.model.AttributeValue(UUID.randomUUID().toString()));
+		auditItem.put("itemKey", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("key").getS()));
+		auditItem.put("modificationTime", new com.amazonaws.services.dynamodbv2.model.AttributeValue(Instant.now().toString()));
+		auditItem.put("updatedAttribute", new com.amazonaws.services.dynamodbv2.model.AttributeValue("value"));
+		auditItem.put("oldValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue(oldImage.get("value").getN()));
+		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("value").getN()));
+
+		putItemInAuditTable(auditItem);
 	}
 
-	private Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> createCommonAuditLogItem(Map<String, AttributeValue> newItem) {
-		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> item = new HashMap<>();
-		item.put("id", new com.amazonaws.services.dynamodbv2.model.AttributeValue(UUID.randomUUID().toString()));
-		item.put("itemKey", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newItem.get("key").getS()));
-		item.put("modificationTime", new com.amazonaws.services.dynamodbv2.model.AttributeValue(Instant.now().toString()));
-		return item;
+	private void putItemInAuditTable(Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> auditItem) {
+		dynamoDBClient.putItem(new PutItemRequest().withTableName(AUDIT_TABLE_NAME).withItem(auditItem));
 	}
 }
