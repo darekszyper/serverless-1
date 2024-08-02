@@ -92,3 +92,17 @@ A
 task05/task05.iml,f\3\f3b783654bbd0c202980716279a4aa84b839ca7e
 `
 0task05/jsrc/main/java/com/task05/ApiHandler.java,8\6\86cbefa18809f67e2629e91b35f516301fe79a90
+A
+task06/task06.iml,0\0\002cb2109b5891784e369d109fdc034300cfd425
+A
+task06/.gitignore,e\1\e12b845a720c22de7c0f88d708244d8cd544e01e
+C
+task06/CHANGELOG.md,1\7\17149da95443df6fa192e2d02b89dcf33de93a7b
+>
+task06/pom.xml,4\c\4cb8a4d6542dc22f41adbef3010b4cf25e46ab0e
+@
+task06/README.md,6\3\630413ae114060be452dc10a3c4bf75274792a76
+P
+ task06/deployment_resources.json,1\5\155561cd1b97c293dbc2a04f60b5fea12a64acbb
+c
+3task06/jsrc/main/java/com/task06/AuditProducer.java,b\b\bbb30755613c99e026d81292dc0855b33064582f
