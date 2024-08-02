@@ -48,15 +48,15 @@ public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 
 	private void handleInsert(Map<String, AttributeValue> newItem) {
 		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> item = createCommonAuditLogItem(newItem);
-		item.put("newValue", createMapAttributeValue(newItem.get("key").getS(), newItem.get("value").getN()));
+		item.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(newItem.get("value").getN()));
 		dynamoDB.putItem(new PutItemRequest().withTableName("cmtr-7a75be14-Audit-test").withItem(item));
 	}
 
 	private void handleUpdate(Map<String, AttributeValue> oldItem, Map<String, AttributeValue> newItem) {
 		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> item = createCommonAuditLogItem(newItem);
 		item.put("updatedAttribute", new com.amazonaws.services.dynamodbv2.model.AttributeValue("value"));
-		item.put("oldValue", createMapAttributeValue(oldItem.get("key").getS(), oldItem.get("value").getN()));
-		item.put("newValue", createMapAttributeValue(newItem.get("key").getS(), newItem.get("value").getN()));
+		item.put("oldValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(oldItem.get("value").getN()));
+		item.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(newItem.get("value").getN()));
 		dynamoDB.putItem(new PutItemRequest().withTableName("cmtr-7a75be14-Audit-test").withItem(item));
 	}
 
@@ -66,12 +66,5 @@ public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 		item.put("itemKey", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newItem.get("key").getS()));
 		item.put("modificationTime", new com.amazonaws.services.dynamodbv2.model.AttributeValue(Instant.now().toString()));
 		return item;
-	}
-
-	private com.amazonaws.services.dynamodbv2.model.AttributeValue createMapAttributeValue(String key, String value) {
-		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> map = new HashMap<>();
-		map.put("key", new com.amazonaws.services.dynamodbv2.model.AttributeValue(key));
-		map.put("value", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(value));
-		return new com.amazonaws.services.dynamodbv2.model.AttributeValue().withM(map);
 	}
 }
