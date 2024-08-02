@@ -23,7 +23,6 @@ import java.util.UUID;
 @DynamoDbTriggerEventSource(targetTable = "Configuration", batchSize = 1)
 public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 
-
 	private final AmazonDynamoDB dynamoDB;
 
 	public AuditProducer() {
@@ -72,7 +71,7 @@ public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 	private com.amazonaws.services.dynamodbv2.model.AttributeValue createMapAttributeValue(String key, String value) {
 		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> map = new HashMap<>();
 		map.put("key", new com.amazonaws.services.dynamodbv2.model.AttributeValue(key));
-		map.put("value", new com.amazonaws.services.dynamodbv2.model.AttributeValue(value));
+		map.put("value", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(value));
 		return new com.amazonaws.services.dynamodbv2.model.AttributeValue().withM(map);
 	}
 }
