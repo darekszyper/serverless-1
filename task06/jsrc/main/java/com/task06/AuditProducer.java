@@ -46,7 +46,11 @@ public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 		auditItem.put("id", new com.amazonaws.services.dynamodbv2.model.AttributeValue(UUID.randomUUID().toString()));
 		auditItem.put("itemKey", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("key").getS()));
 		auditItem.put("modificationTime", new com.amazonaws.services.dynamodbv2.model.AttributeValue(Instant.now().toString()));
-		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("value").getN()));
+
+		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> newValueMap = new HashMap<>();
+		newValueMap.put("key", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("key").getS()));
+		newValueMap.put("value", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("value").getN()));
+		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withM(newValueMap));
 
 		putItemInAuditTable(auditItem);
 	}
@@ -57,8 +61,16 @@ public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 		auditItem.put("itemKey", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("key").getS()));
 		auditItem.put("modificationTime", new com.amazonaws.services.dynamodbv2.model.AttributeValue(Instant.now().toString()));
 		auditItem.put("updatedAttribute", new com.amazonaws.services.dynamodbv2.model.AttributeValue("value"));
-		auditItem.put("oldValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue(oldImage.get("value").getN()));
-		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("value").getN()));
+
+		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> oldValueMap = new HashMap<>();
+		oldValueMap.put("key", new com.amazonaws.services.dynamodbv2.model.AttributeValue(oldImage.get("key").getS()));
+		oldValueMap.put("value", new com.amazonaws.services.dynamodbv2.model.AttributeValue(oldImage.get("value").getN()));
+		auditItem.put("oldValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withM(oldValueMap));
+
+		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> newValueMap = new HashMap<>();
+		newValueMap.put("key", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("key").getS()));
+		newValueMap.put("value", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newImage.get("value").getN()));
+		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withM(newValueMap));
 
 		putItemInAuditTable(auditItem);
 	}
