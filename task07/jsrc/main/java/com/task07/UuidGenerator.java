@@ -31,7 +31,7 @@ import java.util.UUID;
 public class UuidGenerator implements RequestHandler<Object, String> {
 
 	private static final int UUID_COUNT = 10;
-	private static final String S3_BUCKET_NAME = "cmtr-7a75be14-uuid-storage";
+	private static final String S3_BUCKET_NAME = "cmtr-7a75be14-uuid-storage-test";
 	private static final Regions AWS_REGION = Regions.EU_CENTRAL_1;
 
 	@Override
