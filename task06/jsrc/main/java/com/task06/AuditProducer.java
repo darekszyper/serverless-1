@@ -44,12 +44,19 @@ public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 	private void createAuditLogForInsert(Map<String, AttributeValue> newRecord) {
 		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> auditItem = new HashMap<>();
 		auditItem.put("id", new com.amazonaws.services.dynamodbv2.model.AttributeValue(UUID.randomUUID().toString()));
-		auditItem.put("itemKey", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newRecord.get("key").getS()));
+		com.amazonaws.services.dynamodbv2.model.AttributeValue key = new com.amazonaws.services.dynamodbv2.model.AttributeValue(newRecord.get("key").getS());
+		auditItem.put("itemKey", key);
 		auditItem.put("modificationTime", new com.amazonaws.services.dynamodbv2.model.AttributeValue(Instant.now().toString()));
-		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newRecord.get("value").getN()));
+
+		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> newValue = new HashMap<>();
+		newValue.put("key", key);
+		newValue.put("value", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newRecord.get("value").getN()));
+
+		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withM(newValue));
 
 		dynamoDBClient.putItem(new PutItemRequest().withTableName("cmtr-7a75be14-Audit-test").withItem(auditItem));
 	}
+
 
 	private void createAuditLogForUpdate(Map<String, AttributeValue> oldRecord, Map<String, AttributeValue> newRecord) {
 		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> auditItem = new HashMap<>();
