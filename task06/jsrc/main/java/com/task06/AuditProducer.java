@@ -50,7 +50,7 @@ public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 
 		Map<String, com.amazonaws.services.dynamodbv2.model.AttributeValue> newValue = new HashMap<>();
 		newValue.put("key", key);
-		newValue.put("value", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newRecord.get("value").getN()));
+		newValue.put("value", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(newRecord.get("value").getN()));
 
 		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withM(newValue));
 
