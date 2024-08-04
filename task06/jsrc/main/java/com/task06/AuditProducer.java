@@ -64,8 +64,8 @@ public class AuditProducer implements RequestHandler<DynamodbEvent, Void> {
 		auditItem.put("itemKey", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newRecord.get("key").getS()));
 		auditItem.put("modificationTime", new com.amazonaws.services.dynamodbv2.model.AttributeValue(Instant.now().toString()));
 		auditItem.put("updatedAttribute", new com.amazonaws.services.dynamodbv2.model.AttributeValue("value"));
-		auditItem.put("oldValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue(oldRecord.get("value").getN()));
-		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue(newRecord.get("value").getN()));
+		auditItem.put("oldValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(oldRecord.get("value").getN()));
+		auditItem.put("newValue", new com.amazonaws.services.dynamodbv2.model.AttributeValue().withN(newRecord.get("value").getN()));
 
 		dynamoDBClient.putItem(new PutItemRequest().withTableName("cmtr-7a75be14-Audit-test").withItem(auditItem));
 	}
