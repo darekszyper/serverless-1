@@ -106,3 +106,23 @@ P
  task06/deployment_resources.json,1\5\155561cd1b97c293dbc2a04f60b5fea12a64acbb
 c
 3task06/jsrc/main/java/com/task06/AuditProducer.java,b\b\bbb30755613c99e026d81292dc0855b33064582f
+A
+task07/.gitignore,3\9\3903f3cf408a08ac98387e5d478567f7abe40ec9
+P
+ task07/deployment_resources.json,a\a\aa5f609d5d0d71df50485a7b28385ff7e7195a6e
+C
+task07/CHANGELOG.md,a\2\a2b4c2a01fcfa545692cec6b2bd8597dc71ac679
+@
+task07/README.md,5\b\5b82fa0547bc25069454e29561cb33233a5f0d83
+>
+task07/pom.xml,0\f\0fe9e88766dee2de10c8c857bc46465cda1a973c
+A
+task07/task07.iml,f\3\f36a29d4d90b84167f59f0cf013184a5170bd793
+c
+3task07/jsrc/main/java/com/task07/UuidGenerator.java,7\f\7ff3232969df35566897e3b4acff47a344e695d9
+>
+task08/pom.xml,d\0\d0e27e9e89e1c0429b31ddf6b632a6bfd35e059a
+A
+task08/.gitignore,6\b\6bba54fe712002688fe72210559ca1bbb26cae37
+`
+0task08/jsrc/main/java/com/task08/ApiHandler.java,7\e\7e226f6a4d9d81fec2fe37d2610d0e272e6e6b20
