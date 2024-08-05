@@ -1,0 +1,34 @@
+{
+  "sdkLayer" : {
+    "name" : "sdkLayer",
+    "runtimes" : [ "java11" ],
+    "resource_type" : "lambda_layer",
+    "deployment_package" : "sdkLayer-assembly.zip",
+    "libraries" : [ "lib/gson-2.10.1.jar" ]
+  },
+  "apiHandler" : {
+    "name" : "apiHandler",
+    "lambda_path" : "C:\\Users\\dariu\\IdeaProjects\\serverless-practice\\task08",
+    "version" : "1.0.0",
+    "func_name" : "com.task08.ApiHandler",
+    "deployment_package" : "task08-1.0.0.jar",
+    "resource_type" : "lambda",
+    "runtime" : "java11",
+    "architectures" : [ "x86_64" ],
+    "iam_role_name" : "apiHandlerRole",
+    "memory" : 1024,
+    "timeout" : 300,
+    "subnet_ids" : [ ],
+    "security_group_ids" : [ ],
+    "dependencies" : [ ],
+    "event_sources" : [ ],
+    "env_variables" : { },
+    "publish_version" : false,
+    "layers" : [ "sdkLayer" ],
+    "snap_start" : "None",
+    "url_config" : {
+      "auth_type" : "NONE",
+      "invoke_mode" : "BUFFERED"
+    }
+  }
+}

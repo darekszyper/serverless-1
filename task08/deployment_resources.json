@@ -29,12 +29,6 @@
   },
   "task8_api": {
     "deploy_stage": "api",
-    "dependencies": [
-      {
-        "resource_name": "api_handler",
-        "resource_type": "lambda"
-      }
-    ],
     "resources": {
       "/weather": {
         "GET": {
