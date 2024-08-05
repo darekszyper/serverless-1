@@ -21,12 +21,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @LambdaHandler(
-		lambdaName = "apiHandler",
-		roleName = "apiHandlerRole",
-		layers = {"sdkLayer"}
+		lambdaName = "api_handler",
+		roleName = "api_handler-role",
+		layers = {"sdk-layer"}
 )
 @LambdaLayer(
-		layerName = "sdkLayer",
+		layerName = "sdk-layer",
 		libraries = {"lib/gson-2.10.1.jar"},
 		runtime = DeploymentRuntime.JAVA11,
 		artifactExtension = ArtifactExtension.ZIP
