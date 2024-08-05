@@ -41,6 +41,7 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, S
 
 	@Override
 	public String handleRequest(APIGatewayProxyRequestEvent request, Context context) {
+		Gson gson = new Gson();
 		try {
 			return fetchWeatherData();
 		} catch (IOException e) {
