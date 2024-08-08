@@ -1,17 +1,18 @@
 package com.task10;
 
+
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
 import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syndicate.deployment.annotations.lambda.LambdaHandler;
 import com.syndicate.deployment.model.RetentionSetting;
-import com.task10.service.ReservationService;
-import com.task10.service.SignInService;
-import com.task10.service.SignUpService;
-import com.task10.service.TableService;
+import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
+import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthResponse;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
-import java.io.IOException;
+import java.util.Map;
 
 
 @LambdaHandler(lambdaName = "api_handler",
@@ -21,56 +22,106 @@ import java.io.IOException;
 
 public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
-    private final SignInService signInService;
-    private final SignUpService signUpService;
+    private final CognitoService cognitoService;
     private final TableService tableService;
     private final ReservationService reservationService;
+    private final ObjectMapper objectMapper;
 
     public ApiHandler() {
-        this.signInService = new SignInService();
-        this.signUpService = new SignUpService();
-        this.tableService = new TableService();
-        this.reservationService = new ReservationService();
+        this.cognitoService = new CognitoService(CognitoIdentityProviderClient.builder().build());
+        this.tableService = new TableService(DynamoDbClient.builder().build());
+        this.reservationService = new ReservationService(DynamoDbClient.builder().build());
+        this.objectMapper = new ObjectMapper();
     }
 
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent apiGatewayProxyRequestEvent, Context context) {
+    @Override
+    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
+        String path = request.getPath();
+        String httpMethod = request.getHttpMethod();
+        Map<String, String> headers = request.getHeaders();
+        Map<String, String> queryParams = request.getQueryStringParameters();
+        String body = request.getBody();
 
-        String path = apiGatewayProxyRequestEvent.getPath();
-        String httpMethod = apiGatewayProxyRequestEvent.getHttpMethod();
+        switch (path) {
+            case "/signup":
+                return handleSignup(body);
+            case "/signin":
+                return handleSignin(body);
+            case "/tables":
+                return httpMethod.equals("GET") ? handleGetTables() : handleCreateTable(body);
+            case "/reservations":
+                return httpMethod.equals("GET") ? handleGetReservations() : handleCreateReservation(body);
+            default:
+                return new APIGatewayProxyResponseEvent().withStatusCode(400);
+        }
+    }
 
-        if (path.equals("/signup") && httpMethod.equals("POST")) {
-            return signUpService.handleSignUp(apiGatewayProxyRequestEvent);
-        } else if (path.equals("/signin") && httpMethod.equals("POST")) {
-            return signInService.handleSignIn(apiGatewayProxyRequestEvent);
-        } else if (path.equals("/tables") && httpMethod.equals("GET")) {
-            return tableService.getTables();
-        } else if (path.equals("/tables") && httpMethod.equals("POST")) {
-            try {
-                return tableService.saveTable(apiGatewayProxyRequestEvent.getBody());
-            } catch (IOException e) {
-                return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.toString());
-            }
-        } else if (path.matches("/tables/\\d+") && httpMethod.equals("GET")) {
-            int tableId = Integer.parseInt(apiGatewayProxyRequestEvent.getPathParameters().get("tableId"));
-            try {
-                return tableService.getTablesById(tableId);
-            } catch (Exception e) {
-                return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.toString());
-            }
-        } else if (path.equals("/reservations") && httpMethod.equals("POST")) {
-            try {
-                return reservationService.saveReservation(apiGatewayProxyRequestEvent.getBody());
-            } catch (IOException e) {
-                return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.toString());
-            }
-        } else if (path.equals("/reservations") && httpMethod.equals("GET")) {
-            try {
-                return reservationService.getAllReservations();
-            } catch (Exception e) {
-                return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.toString());
-            }
-        } else {
-            return new APIGatewayProxyResponseEvent().withStatusCode(404).withBody("Error request");
+    private APIGatewayProxyResponseEvent handleSignup(String body) {
+        try {
+            Map<String, String> userData = objectMapper.readValue(body, Map.class);
+            cognitoService.signUpUser(
+                    userData.get("firstName"),
+                    userData.get("lastName"),
+                    userData.get("email"),
+                    userData.get("password")
+            );
+            return new APIGatewayProxyResponseEvent().withStatusCode(200);
+        } catch (Exception e) {
+            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.getMessage());
+        }
+    }
+
+    private APIGatewayProxyResponseEvent handleSignin(String body) {
+        try {
+            Map<String, String> credentials = objectMapper.readValue(body, Map.class);
+            AdminInitiateAuthResponse response = cognitoService.signInUser(
+                    credentials.get("email"),
+                    credentials.get("password")
+            );
+            String accessToken = response.authenticationResult().idToken();
+            return new APIGatewayProxyResponseEvent().withStatusCode(200).withBody("{\"accessToken\":\"" + accessToken + "\"}");
+        } catch (Exception e) {
+            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.getMessage());
+        }
+    }
+
+    private APIGatewayProxyResponseEvent handleGetTables() {
+        try {
+            return new APIGatewayProxyResponseEvent()
+                    .withStatusCode(200)
+                    .withBody(objectMapper.writeValueAsString(Map.of("tables", tableService.getAllTables())));
+        } catch (Exception e) {
+            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.getMessage());
+        }
+    }
+
+    private APIGatewayProxyResponseEvent handleCreateTable(String body) {
+        try {
+            Table table = objectMapper.readValue(body, Table.class);
+            tableService.createTable(table);
+            return new APIGatewayProxyResponseEvent().withStatusCode(200).withBody("{\"id\":" + table.getId() + "}");
+        } catch (Exception e) {
+            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.getMessage());
+        }
+    }
+
+    private APIGatewayProxyResponseEvent handleGetReservations() {
+        try {
+            return new APIGatewayProxyResponseEvent()
+                    .withStatusCode(200)
+                    .withBody(objectMapper.writeValueAsString(Map.of("reservations", reservationService.getAllReservations())));
+        } catch (Exception e) {
+            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.getMessage());
+        }
+    }
+
+    private APIGatewayProxyResponseEvent handleCreateReservation(String body) {
+        try {
+            Reservation reservation = objectMapper.readValue(body, Reservation.class);
+            String reservationId = reservationService.createReservation(reservation);
+            return new APIGatewayProxyResponseEvent().withStatusCode(200).withBody("{\"reservationId\":\"" + reservationId + "\"}");
+        } catch (Exception e) {
+            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.getMessage());
         }
     }
 }
