@@ -14,7 +14,7 @@ public class CognitoService {
 
     public void signUpUser(String firstName, String lastName, String email, String password) {
         AdminCreateUserRequest createUserRequest = AdminCreateUserRequest.builder()
-                .userPoolId(System.getenv("USER_POOL_ID"))
+                .userPoolId(System.getenv("COGNITO_ID"))
                 .username(email)
                 .userAttributes(
                         AttributeType.builder().name("given_name").value(firstName).build(),
@@ -30,8 +30,8 @@ public class CognitoService {
 
     public AdminInitiateAuthResponse signInUser(String email, String password) {
         AdminInitiateAuthRequest authRequest = AdminInitiateAuthRequest.builder()
-                .userPoolId(System.getenv("USER_POOL_ID"))
-                .clientId(System.getenv("APP_CLIENT_ID"))
+                .userPoolId(System.getenv("COGNITO_ID"))
+                .clientId(System.getenv("CLIENT_ID"))
                 .authFlow(AuthFlowType.ADMIN_NO_SRP_AUTH)
                 .authParameters(Map.of("USERNAME", email, "PASSWORD", password))
                 .build();
