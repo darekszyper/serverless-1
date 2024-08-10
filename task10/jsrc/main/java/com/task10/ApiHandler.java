@@ -13,6 +13,8 @@ import com.syndicate.deployment.model.ResourceType;
 import com.syndicate.deployment.model.RetentionSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AdminInitiateAuthResponse;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -40,30 +42,39 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
     private final TableService tableService;
     private final ReservationService reservationService;
     private final ObjectMapper objectMapper;
+    private final Map<String, String> headersForCORS;
+    private final Map<RouteKey, RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>> handlersByRouteKey;
+
+
 
     public ApiHandler() {
         logger.info("Initializing ApiHandler...");
-        this.cognitoService = new CognitoService(CognitoIdentityProviderClient.builder().build());
+        this.cognitoService = new CognitoService(CognitoIdentityProviderClient.builder()
+                .region(Region.of(System.getenv("REGION")))
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build());
         this.tableService = new TableService(DynamoDbClient.builder().build());
         this.reservationService = new ReservationService(DynamoDbClient.builder().build());
         this.objectMapper = new ObjectMapper();
+        this.headersForCORS = initHeadersForCORS();
+        this.handlersByRouteKey = initHandlers();
     }
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent request, Context context) {
-        String path = request.getPath();
-        String httpMethod = request.getHttpMethod();
-        Map<String, String> headers = request.getHeaders();
-        String body = request.getBody();
+    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent requestEvent, Context context) {
+        String path = requestEvent.getPath();
+        String httpMethod = requestEvent.getHttpMethod();
+        Map<String, String> headers = requestEvent.getHeaders();
+        String body = requestEvent.getBody();
 
-        logger.info("Received request - Path: {}, Method: {}, Headers: {}", path, httpMethod, headers);
+        logger.info("Received requestEvent - Path: {}, Method: {}, Headers: {}", path, httpMethod, headers);
 
         switch (path) {
             case "/signup":
-                context.getLogger().log("Case = signup\n" + "headers\n" + headers + "\n" + "body\n" + body);
-                return handleSignup(body);
             case "/signin":
-                return handleSignin(body);
+                return getHandler(requestEvent)
+                        .handleRequest(requestEvent, context)
+                        .withHeaders(headersForCORS);
             case "/tables":
                 return httpMethod.equals("GET") ? handleGetTables() : handleCreateTable(body);
             case "/reservations":
@@ -72,6 +83,14 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
                 logger.error("Invalid path: {}", path);
                 return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid path.");
         }
+    }
+
+    private RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> getHandler(APIGatewayProxyRequestEvent requestEvent) {
+        return handlersByRouteKey.get(getRouteKey(requestEvent));
+    }
+
+    private RouteKey getRouteKey(APIGatewayProxyRequestEvent requestEvent) {
+        return new RouteKey(requestEvent.getHttpMethod(), requestEvent.getPath());
     }
 
     private APIGatewayProxyResponseEvent handleSignup(String body) {
@@ -169,5 +188,25 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
             logger.error("CreateReservation failed: {}", e.getMessage(), e);
             return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.getMessage());
         }
+    }
+
+    private Map<RouteKey, RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>> initHandlers() {
+        return Map.of(
+                new RouteKey("POST", "/signup"), new PostSignUpHandler(cognitoService.getCognitoClient()),
+                new RouteKey("POST", "/signin"), new PostSignInHandler(cognitoService.getCognitoClient())
+        );
+    }
+
+    /**
+     * To allow all origins, all methods, and common headers
+     * <a href="https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-cors.html">Using cross-origin resource sharing (CORS)</a>
+     */
+    private Map<String, String> initHeadersForCORS() {
+        return Map.of(
+                "Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                "Access-Control-Allow-Origin", "*",
+                "Access-Control-Allow-Methods", "*",
+                "Accept-Version", "*"
+        );
     }
 }

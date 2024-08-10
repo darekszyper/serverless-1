@@ -37,4 +37,8 @@ public class CognitoService {
                 .build();
         return cognitoClient.adminInitiateAuth(authRequest);
     }
+
+    public CognitoIdentityProviderClient getCognitoClient() {
+        return cognitoClient;
+    }
 }
