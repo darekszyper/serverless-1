@@ -46,11 +46,11 @@ public abstract class CognitoSupport {
                         .temporaryPassword(signUp.password())
                         .userAttributes(
                                 AttributeType.builder()
-                                        .name("firstName")
+                                        .name("given_name")
                                         .value(signUp.firstName())
                                         .build(),
                                 AttributeType.builder()
-                                        .name("lastName")
+                                        .name("family_name")
                                         .value(signUp.lastName())
                                         .build(),
                                 AttributeType.builder()

@@ -40,7 +40,7 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 
     private static final Logger logger = LoggerFactory.getLogger(ApiHandler.class);
 
-    private final CognitoService cognitoService;
+    private final CognitoIdentityProviderClient cognitoClient;
     private final TableService tableService;
     private final ReservationService reservationService;
     private final ObjectMapper objectMapper;
@@ -49,10 +49,11 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 
     public ApiHandler() {
         logger.info("Initializing ApiHandler...");
-        this.cognitoService = new CognitoService(CognitoIdentityProviderClient.builder()
-                .region(Region.of(System.getenv("REGION")))
-                .credentialsProvider(DefaultCredentialsProvider.create())
-                .build());
+        this.cognitoClient = initCognitoClient();
+//        this.cognitoService = new CognitoService(CognitoIdentityProviderClient.builder()
+//                .region(Region.of(System.getenv("REGION")))
+//                .credentialsProvider(DefaultCredentialsProvider.create())
+//                .build());
         this.tableService = new TableService(DynamoDbClient.builder().build());
         this.reservationService = new ReservationService(DynamoDbClient.builder().build());
         this.objectMapper = new ObjectMapper();
@@ -96,6 +97,13 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
             logger.error("Error handling request: {}", e.getMessage(), e);
             return new APIGatewayProxyResponseEvent().withStatusCode(500).withBody("Internal Server Error");
         }
+    }
+
+    private CognitoIdentityProviderClient initCognitoClient() {
+        return CognitoIdentityProviderClient.builder()
+                .region(Region.of(System.getenv("REGION")))
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
     }
 
     private RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> getHandler(APIGatewayProxyRequestEvent requestEvent) {
@@ -169,8 +177,8 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 
     private Map<RouteKey, RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent>> initHandlers() {
         return Map.of(
-                new RouteKey("POST", "/signup"), new PostSignUpHandler(cognitoService.getCognitoClient()),
-                new RouteKey("POST", "/signin"), new PostSignInHandler(cognitoService.getCognitoClient())
+                new RouteKey("POST", "/signup"), new PostSignUpHandler(cognitoClient),
+                new RouteKey("POST", "/signin"), new PostSignInHandler(cognitoClient)
         );
     }
 
