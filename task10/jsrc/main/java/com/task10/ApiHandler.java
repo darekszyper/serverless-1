@@ -9,6 +9,7 @@ import com.syndicate.deployment.annotations.environment.EnvironmentVariable;
 import com.syndicate.deployment.annotations.environment.EnvironmentVariables;
 import com.syndicate.deployment.annotations.lambda.LambdaHandler;
 import com.syndicate.deployment.annotations.resources.DependsOn;
+import com.syndicate.deployment.model.DeploymentRuntime;
 import com.syndicate.deployment.model.ResourceType;
 import com.syndicate.deployment.model.RetentionSetting;
 import org.slf4j.Logger;
@@ -26,8 +27,10 @@ import static com.syndicate.deployment.model.environment.ValueTransformer.USER_P
 
 @LambdaHandler(lambdaName = "api_handler",
         roleName = "api_handler-role",
+        runtime = DeploymentRuntime.JAVA17,
         logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
 )
+
 @DependsOn(resourceType = ResourceType.COGNITO_USER_POOL, name = "${booking_userpool}")
 @EnvironmentVariables(value = {
         @EnvironmentVariable(key = "REGION", value = "${region}"),
