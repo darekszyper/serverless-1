@@ -1,11 +1,13 @@
 package com.task10;
 
-// Table.java
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Table {
 
     private int id;
     private int number;
     private int places;
+    @JsonProperty("isVip")
     private boolean isVip;
     private Integer minOrder;
 

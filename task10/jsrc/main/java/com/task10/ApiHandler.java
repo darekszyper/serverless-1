@@ -68,7 +68,8 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
         Map<String, String> headers = requestEvent.getHeaders();
         String body = requestEvent.getBody();
 
-        if (path.equals("/signin")) logger.info("2343254543543545535\nReceived requestEvent - Path: {}, Method: {}, Headers: {}, Body: {}", path, httpMethod, headers, body);
+        if (path.equals("/signin"))
+            logger.info("2343254543543545535\nReceived requestEvent - Path: {}, Method: {}, Headers: {}, Body: {}", path, httpMethod, headers, body);
         logger.info("Received requestEvent - Path: {}, Method: {}, Headers: {}, Body: {}", path, httpMethod, headers, body);
 
         try {
@@ -88,16 +89,54 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
                 case "/reservations":
                     return httpMethod.equals("GET") ? handleGetReservations() : handleCreateReservation(body);
                 default:
-                    logger.error("Invalid path: {}", path);
-                    return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid path.");
+                    if (httpMethod.equals("GET") && path.matches("/tables/\\d+")) {
+                        return handleGetTableById(path);
+                    } else {
+                        logger.error("Invalid path or method: {} {}", path, httpMethod);
+                        return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid path or method.");
+                    }
+//                case "/tables":
+//                    return httpMethod.equals("GET") ? handleGetTables() : handleCreateTable(body);
+//                case "/reservations":
+//                    return httpMethod.equals("GET") ? handleGetReservations() : handleCreateReservation(body);
+//                default:
+//                    logger.error("Invalid path: {}", path);
+//                    return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid path.");
             }
         } catch (Exception e) {
             if (path.equals("/signup")) logger.error("23253253 - Error handling signup request: {}", e.getMessage(), e);
-            if (path.equals("/signin")) logger.error("2343254543543545535\nError handling request: {}", e.getMessage(), e);
+            if (path.equals("/signin"))
+                logger.error("2343254543543545535\nError handling request: {}", e.getMessage(), e);
             logger.error("Error handling request: {}", e.getMessage(), e);
             return new APIGatewayProxyResponseEvent().withStatusCode(500).withBody("Internal Server Error");
         }
     }
+
+    private APIGatewayProxyResponseEvent handleGetTableById(String path) {
+        logger.info("Handling getTableById request for path: {}", path);
+        try {
+            // Extract tableId from the path
+            String[] pathParts = path.split("/");
+            int tableId = Integer.parseInt(pathParts[pathParts.length - 1]);
+
+            // Retrieve table by ID
+            Table table = tableService.getTable(tableId);
+            if (table == null) {
+                return new APIGatewayProxyResponseEvent()
+                        .withStatusCode(404)
+                        .withBody("Table not found");
+            }
+
+            // Return the table information
+            return new APIGatewayProxyResponseEvent()
+                    .withStatusCode(200)
+                    .withBody(objectMapper.writeValueAsString(table));
+        } catch (Exception e) {
+            logger.error("GetTableById failed: {}", e.getMessage(), e);
+            return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.getMessage());
+        }
+    }
+
 
     private CognitoIdentityProviderClient initCognitoClient() {
         return CognitoIdentityProviderClient.builder()
@@ -108,7 +147,8 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
 
     private RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> getHandler(APIGatewayProxyRequestEvent requestEvent) {
         RouteKey routeKey = getRouteKey(requestEvent);
-        if (requestEvent.getPath().equals("/signin")) logger.debug("2343254543543545535\nDetermined RouteKey: {}", routeKey);
+        if (requestEvent.getPath().equals("/signin"))
+            logger.debug("2343254543543545535\nDetermined RouteKey: {}", routeKey);
         logger.debug("Determined RouteKey: {}", routeKey);
         return handlersByRouteKey.get(routeKey);
     }
