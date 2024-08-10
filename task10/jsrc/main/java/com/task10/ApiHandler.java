@@ -115,22 +115,20 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
     private APIGatewayProxyResponseEvent handleGetTableById(String path) {
         logger.info("Handling getTableById request for path: {}", path);
         try {
-            // Extract tableId from the path
             String[] pathParts = path.split("/");
             int tableId = Integer.parseInt(pathParts[pathParts.length - 1]);
 
-            // Retrieve table by ID
+            logger.debug("Parsed tableId from path: {}", tableId);
+
             Table table = tableService.getTable(tableId);
             if (table == null) {
-                return new APIGatewayProxyResponseEvent()
-                        .withStatusCode(404)
-                        .withBody("Table not found");
+                logger.warn("Table with ID: {} not found.", tableId);
+                return new APIGatewayProxyResponseEvent().withStatusCode(404).withBody("Table not found");
             }
 
-            // Return the table information
-            return new APIGatewayProxyResponseEvent()
-                    .withStatusCode(200)
-                    .withBody(objectMapper.writeValueAsString(table));
+            String tableJson = objectMapper.writeValueAsString(table);
+            logger.debug("Returning table data: {}", tableJson);
+            return new APIGatewayProxyResponseEvent().withStatusCode(200).withBody(tableJson);
         } catch (Exception e) {
             logger.error("GetTableById failed: {}", e.getMessage(), e);
             return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody(e.getMessage());
@@ -204,7 +202,7 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
         logger.info("Handling createReservation with body: {}", body);
         try {
             Reservation reservation = objectMapper.readValue(body, Reservation.class);
-            logger.debug("Parsed reservation data: {}", reservation);
+            logger.debug("Parsed reservation data: {}", reservation.toString());
 
             String reservationId = reservationService.createReservation(reservation);
             logger.info("Reservation created with ID: {}", reservationId);

@@ -21,7 +21,7 @@ public class ReservationService {
     public String createReservation(Reservation reservation) {
         String reservationId = UUID.randomUUID().toString();
         Map<String, AttributeValue> item = Map.of(
-                "reservationId", AttributeValue.builder().s(reservationId).build(),
+                "id", AttributeValue.builder().s(reservationId).build(),
                 "tableNumber", AttributeValue.builder().n(String.valueOf(reservation.getTableNumber())).build(),
                 "clientName", AttributeValue.builder().s(reservation.getClientName()).build(),
                 "phoneNumber", AttributeValue.builder().s(reservation.getPhoneNumber()).build(),
