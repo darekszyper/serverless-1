@@ -61,4 +61,15 @@ public class Table {
     public void setMinOrder(Integer minOrder) {
         this.minOrder = minOrder;
     }
+
+    @Override
+    public String toString() {
+        return "Table{" +
+                "id=" + id +
+                ", number=" + number +
+                ", places=" + places +
+                ", isVip=" + isVip +
+                ", minOrder=" + minOrder +
+                '}';
+    }
 }

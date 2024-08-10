@@ -6,6 +6,7 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,10 +24,11 @@ public class TableService {
 
     public void createTable(Table table) {
         Map<String, AttributeValue> item = Map.of(
-                "id", AttributeValue.builder().n(String.valueOf(table.getId())).build(),
+                "id", AttributeValue.builder().s(String.valueOf(table.getId())).build(),  // Use .s() to store as string
                 "number", AttributeValue.builder().n(String.valueOf(table.getNumber())).build(),
                 "places", AttributeValue.builder().n(String.valueOf(table.getPlaces())).build(),
                 "isVip", AttributeValue.builder().bool(table.isVip()).build(),
+                // Dynamically include "minOrder" only if it's not null
                 "minOrder", table.getMinOrder() != null ? AttributeValue.builder().n(String.valueOf(table.getMinOrder())).build() : null
         );
 
@@ -37,6 +39,7 @@ public class TableService {
 
         dynamoDbClient.putItem(request);
     }
+
 
     public Table getTable(int tableId) {
         GetItemRequest request = GetItemRequest.builder()

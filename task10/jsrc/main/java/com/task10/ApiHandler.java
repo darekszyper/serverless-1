@@ -175,7 +175,7 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
         logger.info("Handling createTable with body: {}", body);
         try {
             Table table = objectMapper.readValue(body, Table.class);
-            logger.debug("Parsed table data: {}", table);
+            logger.debug("Parsed table data: {}", table.toString());
 
             tableService.createTable(table);
             logger.info("Table created with ID: {}", table.getId());
