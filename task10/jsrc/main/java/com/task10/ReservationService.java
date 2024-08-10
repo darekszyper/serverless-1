@@ -56,7 +56,7 @@ public class ReservationService {
     private boolean tableExists(int tableNumber) {
         GetItemRequest request = GetItemRequest.builder()
                 .tableName(tablesTableName)
-                .key(Map.of("id", AttributeValue.builder().s(String.valueOf(tableNumber)).build()))  // Ensure the ID is stored as a string
+                .key(Map.of("number", AttributeValue.builder().s(String.valueOf(tableNumber)).build()))  // Ensure the ID is stored as a string
                 .build();
 
         Map<String, AttributeValue> item = dynamoDbClient.getItem(request).item();
