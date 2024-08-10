@@ -19,10 +19,13 @@ public class ReservationService {
     private final String reservationTableName = RESERVATION_TABLE_NAME;
     private final String tablesTableName = TABLES_TABLE_NAME;
 
+    TableService tableService;
+
     private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);
 
     public ReservationService(DynamoDbClient dynamoDbClient) {
         this.dynamoDbClient = dynamoDbClient;
+        this.tableService = new TableService(dynamoDbClient);
     }
 
     public String createReservation(Reservation reservation) {
@@ -79,20 +82,35 @@ public class ReservationService {
     private boolean tableExists(int tableNumber) {
         logger.debug("Checking if table exists for tableNumber: {}", tableNumber);
 
-        GetItemRequest request = GetItemRequest.builder()
-                .tableName(tablesTableName)
-                .key(Map.of("number", AttributeValue.builder().n(String.valueOf(tableNumber)).build()))  // Ensure the ID is stored as a string
-                .build();
-
         try {
-            Map<String, AttributeValue> item = dynamoDbClient.getItem(request).item();
-            boolean exists = item != null && !item.isEmpty();
+            // Fetch all tables
+            List<Table> allTables = tableService.getAllTables();
+
+            // Check if any table in the list matches the given table number
+            boolean exists = allTables.stream()
+                    .anyMatch(table -> table.getNumber() == tableNumber);
+
             logger.debug("Table exists check result for tableNumber {}: {}", tableNumber, exists);
             return exists;
-        } catch (DynamoDbException e) {
+        } catch (Exception e) {
             logger.error("Error checking if table exists", e);
-            throw new RuntimeException(e); // Rethrow or handle as needed
+            throw new RuntimeException(e); // Handle or rethrow the exception as needed
         }
+
+//        GetItemRequest request = GetItemRequest.builder()
+//                .tableName(tablesTableName)
+//                .key(Map.of("number", AttributeValue.builder().n(String.valueOf(tableNumber)).build()))
+//                .build();
+
+//        try {
+//            Map<String, AttributeValue> item = dynamoDbClient.getItem(request).item();
+//            boolean exists = item != null && !item.isEmpty();
+//            logger.debug("Table exists check result for tableNumber {}: {}", tableNumber, exists);
+//            return exists;
+//        } catch (DynamoDbException e) {
+//            logger.error("Error checking if table exists", e);
+//            throw new RuntimeException(e); // Rethrow or handle as needed
+//        }
     }
 
     private boolean isOverlappingReservation(Reservation newReservation) {
