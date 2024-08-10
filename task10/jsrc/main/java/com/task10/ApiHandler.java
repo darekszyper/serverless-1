@@ -73,6 +73,7 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
         try {
             switch (path) {
                 case "/signup":
+                    logger.info("23253253 - Handling signup request for path: {}", path);
                     return getHandler(requestEvent)
                             .handleRequest(requestEvent, context)
                             .withHeaders(headersForCORS);
@@ -90,6 +91,7 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
                     return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid path.");
             }
         } catch (Exception e) {
+            if (path.equals("/signup")) logger.error("23253253 - Error handling signup request: {}", e.getMessage(), e);
             if (path.equals("/signin")) logger.error("2343254543543545535\nError handling request: {}", e.getMessage(), e);
             logger.error("Error handling request: {}", e.getMessage(), e);
             return new APIGatewayProxyResponseEvent().withStatusCode(500).withBody("Internal Server Error");
