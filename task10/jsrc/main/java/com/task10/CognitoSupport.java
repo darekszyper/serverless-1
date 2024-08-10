@@ -14,9 +14,6 @@ import software.amazon.awssdk.services.cognitoidentityprovider.model.DeliveryMed
 
 import java.util.Map;
 
-/**
- * Created by Roman Ivanov on 7/20/2024.
- */
 public abstract class CognitoSupport {
 
     private final String userPoolId = System.getenv("COGNITO_ID");
@@ -27,9 +24,9 @@ public abstract class CognitoSupport {
         this.cognitoClient = cognitoClient;
     }
 
-    protected AdminInitiateAuthResponse cognitoSignIn(String nickName, String password) {
+    protected AdminInitiateAuthResponse cognitoSignIn(String email, String password) {
         Map<String, String> authParams = Map.of(
-                "USERNAME", nickName,
+                "USERNAME", email,
                 "PASSWORD", password
         );
 
@@ -45,15 +42,15 @@ public abstract class CognitoSupport {
 
         return cognitoClient.adminCreateUser(AdminCreateUserRequest.builder()
                         .userPoolId(userPoolId)
-                        .username(signUp.nickName())
+                        .username(signUp.email())
                         .temporaryPassword(signUp.password())
                         .userAttributes(
                                 AttributeType.builder()
-                                        .name("given_name")
+                                        .name("firstName")
                                         .value(signUp.firstName())
                                         .build(),
                                 AttributeType.builder()
-                                        .name("family_name")
+                                        .name("lastName")
                                         .value(signUp.lastName())
                                         .build(),
                                 AttributeType.builder()
@@ -72,14 +69,14 @@ public abstract class CognitoSupport {
     }
 
     protected AdminRespondToAuthChallengeResponse confirmSignUp(SignUp signUp) {
-        AdminInitiateAuthResponse adminInitiateAuthResponse = cognitoSignIn(signUp.nickName(), signUp.password());
+        AdminInitiateAuthResponse adminInitiateAuthResponse = cognitoSignIn(signUp.email(), signUp.password());
 
         if (!ChallengeNameType.NEW_PASSWORD_REQUIRED.name().equals(adminInitiateAuthResponse.challengeNameAsString())) {
             throw new RuntimeException("unexpected challenge: " + adminInitiateAuthResponse.challengeNameAsString());
         }
 
         Map<String, String> challengeResponses = Map.of(
-                "USERNAME", signUp.nickName(),
+                "USERNAME", signUp.email(),
                 "PASSWORD", signUp.password(),
                 "NEW_PASSWORD", signUp.password()
         );
