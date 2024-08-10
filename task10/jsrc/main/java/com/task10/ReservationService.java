@@ -81,7 +81,7 @@ public class ReservationService {
 
         GetItemRequest request = GetItemRequest.builder()
                 .tableName(tablesTableName)
-                .key(Map.of("number", AttributeValue.builder().s(String.valueOf(tableNumber)).build()))  // Ensure the ID is stored as a string
+                .key(Map.of("number", AttributeValue.builder().n(String.valueOf(tableNumber)).build()))  // Ensure the ID is stored as a string
                 .build();
 
         try {
