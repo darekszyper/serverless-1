@@ -30,11 +30,11 @@ import static com.syndicate.deployment.model.environment.ValueTransformer.USER_P
         logsExpiration = RetentionSetting.SYNDICATE_ALIASES_SPECIFIED
 )
 
-@DependsOn(resourceType = ResourceType.COGNITO_USER_POOL, name = "${booking_userpool}")
+@DependsOn(resourceType = ResourceType.COGNITO_USER_POOL, name = "simple-booking-userpool")
 @EnvironmentVariables(value = {
         @EnvironmentVariable(key = "REGION", value = "${region}"),
-        @EnvironmentVariable(key = "COGNITO_ID", value = "cmtr-7a75be14-simple-booking-userpool-test", valueTransformer = USER_POOL_NAME_TO_USER_POOL_ID),
-        @EnvironmentVariable(key = "CLIENT_ID", value = "cmtr-7a75be14-simple-booking-userpool-test", valueTransformer = USER_POOL_NAME_TO_CLIENT_ID)
+        @EnvironmentVariable(key = "COGNITO_ID", value = "cmtr-7a75be14-simple-booking-userpool", valueTransformer = USER_POOL_NAME_TO_USER_POOL_ID),
+        @EnvironmentVariable(key = "CLIENT_ID", value = "cmtr-7a75be14-simple-booking-userpool", valueTransformer = USER_POOL_NAME_TO_CLIENT_ID)
 })
 public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
