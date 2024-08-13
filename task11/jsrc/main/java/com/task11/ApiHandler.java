@@ -33,9 +33,9 @@ import static com.syndicate.deployment.model.environment.ValueTransformer.USER_P
 @DependsOn(resourceType = ResourceType.COGNITO_USER_POOL, name = "simple-booking-userpool")
 @EnvironmentVariables(value = {
         @EnvironmentVariable(key = "REGION", value = "${region}"),
-        @EnvironmentVariable(key = "COGNITO_ID", value = "cmtr-7a75be14-simple-booking-userpool", valueTransformer = USER_POOL_NAME_TO_USER_POOL_ID),
-        @EnvironmentVariable(key = "CLIENT_ID", value = "cmtr-7a75be14-simple-booking-userpool", valueTransformer = USER_POOL_NAME_TO_CLIENT_ID)
-})
+        @EnvironmentVariable(key = "COGNITO_ID", value = "cmtr-7a75be14-simple-booking-userpool-test", valueTransformer = USER_POOL_NAME_TO_USER_POOL_ID),
+        @EnvironmentVariable(key = "CLIENT_ID", value = "cmtr-7a75be14-simple-booking-userpool-test", valueTransformer = USER_POOL_NAME_TO_CLIENT_ID)
+})// todo: add test
 public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiHandler.class);
@@ -50,10 +50,6 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
     public ApiHandler() {
         logger.info("Initializing ApiHandler...");
         this.cognitoClient = initCognitoClient();
-//        this.cognitoService = new CognitoService(CognitoIdentityProviderClient.builder()
-//                .region(Region.of(System.getenv("REGION")))
-//                .credentialsProvider(DefaultCredentialsProvider.create())
-//                .build());
         this.tableService = new TableService(DynamoDbClient.builder().build());
         this.reservationService = new ReservationService(DynamoDbClient.builder().build());
         this.objectMapper = new ObjectMapper();
@@ -85,23 +81,21 @@ public class ApiHandler implements RequestHandler<APIGatewayProxyRequestEvent, A
                             .handleRequest(requestEvent, context)
                             .withHeaders(headersForCORS);
                 case "/tables":
-                    return httpMethod.equals("GET") ? handleGetTables() : handleCreateTable(body);
+                    APIGatewayProxyResponseEvent tablesResponse = httpMethod.equals("GET") ? handleGetTables() : handleCreateTable(body);
+                    return tablesResponse.withHeaders(headersForCORS);
                 case "/reservations":
-                    return httpMethod.equals("GET") ? handleGetReservations() : handleCreateReservation(body);
+                    APIGatewayProxyResponseEvent reservationsResponse = httpMethod.equals("GET") ? handleGetReservations() : handleCreateReservation(body);
+                    return reservationsResponse.withHeaders(headersForCORS);
                 default:
                     if (httpMethod.equals("GET") && path.matches("/tables/\\d+")) {
-                        return handleGetTableById(path);
+                        return handleGetTableById(path).withHeaders(headersForCORS);
                     } else {
                         logger.error("Invalid path or method: {} {}", path, httpMethod);
-                        return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid path or method.");
+                        return new APIGatewayProxyResponseEvent()
+                                .withStatusCode(400)
+                                .withBody("Invalid path or method.")
+                                .withHeaders(headersForCORS);
                     }
-//                case "/tables":
-//                    return httpMethod.equals("GET") ? handleGetTables() : handleCreateTable(body);
-//                case "/reservations":
-//                    return httpMethod.equals("GET") ? handleGetReservations() : handleCreateReservation(body);
-//                default:
-//                    logger.error("Invalid path: {}", path);
-//                    return new APIGatewayProxyResponseEvent().withStatusCode(400).withBody("Invalid path.");
             }
         } catch (Exception e) {
             if (path.equals("/signup")) logger.error("23253253 - Error handling signup request: {}", e.getMessage(), e);

@@ -20,14 +20,14 @@
     "event_sources" : [ ],
     "env_variables" : {
       "CLIENT_ID" : {
+        "resource_name" : "cmtr-7a75be14-simple-booking-userpool",
         "parameter" : "client_id",
-        "resource_type" : "cognito_idp",
-        "resource_name" : "cmtr-7a75be14-simple-booking-userpool"
+        "resource_type" : "cognito_idp"
       },
       "COGNITO_ID" : {
+        "resource_name" : "cmtr-7a75be14-simple-booking-userpool",
         "parameter" : "id",
-        "resource_type" : "cognito_idp",
-        "resource_name" : "cmtr-7a75be14-simple-booking-userpool"
+        "resource_type" : "cognito_idp"
       },
       "REGION" : "${region}"
     },
