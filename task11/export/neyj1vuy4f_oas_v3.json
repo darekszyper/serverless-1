@@ -18,9 +18,11 @@
   "paths": {
     "/reservations": {
       "get": {
+        "summary": "Get reservations Details",
+        "description": "Retrieve details of reservations.",
         "responses": {
           "400": {
-            "description": "400 response",
+            "description": "Invalid input",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -37,7 +39,7 @@
             }
           },
           "200": {
-            "description": "200 response",
+            "description": "Successful response",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -87,7 +89,7 @@
         },
         "responses": {
           "200": {
-            "description": "200 response",
+            "description": "Reservation created successfully",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -127,7 +129,7 @@
       "options": {
         "responses": {
           "200": {
-            "description": "200 response",
+            "description": "Successful response",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -175,9 +177,11 @@
     },
     "/tables": {
       "get": {
+        "summary": "Get Tables Details",
+        "description": "Retrieve details of tables.",
         "responses": {
           "400": {
-            "description": "400 response",
+            "description": "Invalid input",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -194,7 +198,7 @@
             }
           },
           "200": {
-            "description": "200 response",
+            "description": "Table list retrieved successfully",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -232,6 +236,8 @@
         }
       },
       "post": {
+        "summary": "Puts new tables",
+        "description": "This endpoint allows to insert new tables.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -244,7 +250,7 @@
         },
         "responses": {
           "400": {
-            "description": "400 response",
+            "description": "Invalid input",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -261,7 +267,7 @@
             }
           },
           "200": {
-            "description": "200 response",
+            "description": "Table was inserted successfully",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -301,7 +307,7 @@
       "options": {
         "responses": {
           "200": {
-            "description": "200 response",
+            "description": "Successful response",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -349,6 +355,8 @@
     },
     "/signin": {
       "post": {
+        "summary": "User Signin",
+        "description": "This endpoint allows a user to sign in by providing necessary details.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -361,7 +369,7 @@
         },
         "responses": {
           "400": {
-            "description": "400 response",
+            "description": "Invalid input",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -378,7 +386,7 @@
             }
           },
           "200": {
-            "description": "200 response",
+            "description": "User signed in successfully",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -389,7 +397,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Empty"
+                  "$ref": "#/components/schemas/SignInResponse"
                 }
               }
             }
@@ -413,7 +421,7 @@
       "options": {
         "responses": {
           "200": {
-            "description": "200 response",
+            "description": "Successful response",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -461,6 +469,8 @@
     },
     "/tables/{tableId}": {
       "get": {
+        "summary": "Get Table Details",
+        "description": "Retrieve details of a specific table by its ID.",
         "parameters": [
           {
             "name": "tableId",
@@ -473,7 +483,7 @@
         ],
         "responses": {
           "400": {
-            "description": "400 response",
+            "description": "Invalid input",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -490,7 +500,7 @@
             }
           },
           "200": {
-            "description": "200 response",
+            "description": "Successful response",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -540,7 +550,7 @@
         ],
         "responses": {
           "200": {
-            "description": "200 response",
+            "description": "Successful response",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -588,6 +598,8 @@
     },
     "/signup": {
       "post": {
+        "summary": "User Signup",
+        "description": "This endpoint allows a new user to sign up by providing necessary details.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -600,7 +612,7 @@
         },
         "responses": {
           "400": {
-            "description": "400 response",
+            "description": "Invalid input",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -617,7 +629,7 @@
             }
           },
           "200": {
-            "description": "200 response",
+            "description": "Successful signup",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
@@ -652,7 +664,7 @@
       "options": {
         "responses": {
           "200": {
-            "description": "200 response",
+            "description": "Successful response",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "schema": {
