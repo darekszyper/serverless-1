@@ -77,6 +77,8 @@
         }
       },
       "post": {
+        "summary": "Create a new reservation",
+        "description": "This endpoint allows the creation of a new reservation.",
         "requestBody": {
           "content": {
             "application/json": {
